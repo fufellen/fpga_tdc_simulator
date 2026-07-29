@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fpga-tdc-simulator"
+version = "0.1.0"
+description = "GUI-имитатор ВЦП на ПЛИС (Gowin GW2A, по мотивам HPTDC): визуализация процессов и расчёт параметров"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.6", "pyqtgraph>=0.13", "numpy>=1.26"]
+
+[project.scripts]
+fpga-tdc-sim = "fpga_tdc_sim.cli:main"
+fpga-tdc-sim-gui = "fpga_tdc_sim.gui.launcher:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
