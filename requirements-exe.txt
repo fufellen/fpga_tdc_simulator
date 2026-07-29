@@ -1,0 +1,5 @@
+# Known-good Windows executable build toolchain.
+PyInstaller==6.21.0
+PySide6==6.11.1
+pyqtgraph==0.14.0
+numpy==2.5.1
