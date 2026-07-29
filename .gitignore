@@ -8,3 +8,5 @@ dist/
 *.spec
 artifacts/
 
+rtl_bridge/_sim/
+rtl_bridge/dumps/
