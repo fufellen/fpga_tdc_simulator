@@ -8,6 +8,8 @@ the bit-exact RTL port.
 
 from __future__ import annotations
 
+import math
+
 import pyqtgraph as pg
 from PySide6.QtWidgets import (
     QDoubleSpinBox,
@@ -61,9 +63,10 @@ class CalcTab(QWidget):
         self.range_plot.setLabel(
             "bottom", "разрядность грубого счётчика, бит"
         )
-        # no units= here: pyqtgraph would add SI prefixes on top of the
-        # log scale and print nonsense exponents
+        # no units= and no SI prefix here: pyqtgraph would scale the
+        # already-logarithmic values and print nonsense exponents
         self.range_plot.setLabel("left", "дальность, м (лог. шкала)")
+        self.range_plot.getAxis("left").enableAutoSIPrefix(False)
         self.range_plot.setLogMode(x=False, y=True)
         left.addWidget(QLabel("Диапазон против разрядности счётчика"))
         left.addWidget(self.range_plot, 1)
@@ -259,8 +262,9 @@ class CalcTab(QWidget):
             pen=pg.mkPen("#e0a13c", width=1,
                          style=pg.QtCore.Qt.PenStyle.DashLine),
         )
+        # the axis is logarithmic: marker positions are log10 values
         self.range_plot.addLine(
-            y=self.target.value(),
+            y=math.log10(max(self.target.value(), 1e-6)),
             pen=pg.mkPen("#3b7dd8", width=1,
                          style=pg.QtCore.Qt.PenStyle.DotLine),
         )
