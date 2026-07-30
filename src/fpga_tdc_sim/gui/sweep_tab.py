@@ -1,4 +1,4 @@
-"""Tab 3: interval sweep and Monte-Carlo statistics.
+"""Interval sweep and Monte-Carlo statistics.
 
 The sweep reproduces ``tdc_top_tb.sv`` exactly (dt = 800..53000 step
 173 ps, START phase 1234 ps) and is compared against the ModelSim
@@ -145,10 +145,14 @@ class SweepTab(QWidget):
         left.addWidget(self.mc_plot, 1)
 
         self.table = QTableWidget(3, 6)
+        # "RMS ошибки", not "СКО": it is the root mean square about
+        # zero (bias included), exactly what the RTL testbench prints —
+        # unlike the Monte-Carlo panel, which shows deviation about the
+        # mean
         self.table.setHorizontalHeaderLabels(
             [
-                "конфигурация", "макс |ош|", "СКО",
-                "ModelSim макс", "ModelSim СКО", "вердикт",
+                "конфигурация", "макс |ош|", "RMS ошибки",
+                "ModelSim макс", "ModelSim RMS", "вердикт",
             ]
         )
         self.table.verticalHeader().setVisible(False)
@@ -230,7 +234,19 @@ class SweepTab(QWidget):
     # ---- configurations -----------------------------------------------------
 
     def set_lut(self, lut: CalibrationLut) -> None:
+        """Adopt a new calibration table and re-run.
+
+        Config C depends on the table, so keeping the old curves on
+        screen would silently show results of a table that is no longer
+        selected.  Re-run when the tab has results already; otherwise
+        the first ``showEvent`` will run it.
+        """
         self.lut = lut
+        if self.results:
+            self.results = {}
+            self.error_plot.clear()
+            self.table.clearContents()
+            self.start_sweep()
 
     def configs(self) -> dict:
         return {

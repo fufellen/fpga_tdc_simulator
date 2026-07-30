@@ -1,4 +1,4 @@
-"""Tab 1: one START->STOP measurement, step by step.
+"""One START->STOP measurement, step by step.
 
 Shows the physical timing (clock, hit pulses, sampling edges), the
 delay-line state at the freezing edge, the raw thermometer code and how

@@ -1,4 +1,4 @@
-"""Tab 5: analog front end — time-walk, CFD, width-based correction.
+"""Analog front end — time-walk, CFD, width-based correction.
 
 Shows why the STOP edge needs a discriminator and what each option
 costs: a fixed threshold walks with amplitude, a CFD does not, and a

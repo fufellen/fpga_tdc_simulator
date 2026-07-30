@@ -33,9 +33,23 @@ class MainWindowTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.app = QApplication.instance() or QApplication([])
 
+    def setUp(self) -> None:
+        # Isolated settings for every test: the default QSettings would
+        # read this machine's real registry, so a developer who once
+        # moved a control in the app would break the suite.
+        self._settings_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._settings_dir.cleanup)
+
+    def settings_path(self) -> str:
+        return os.path.join(self._settings_dir.name, "settings.ini")
+
     def make_window(self, settings=None, persist=False):
         from fpga_tdc_sim.gui.app import MainWindow
 
+        if settings is None:
+            settings = QSettings(
+                self.settings_path(), QSettings.Format.IniFormat
+            )
         return MainWindow(settings=settings, persist_settings=persist)
 
     def test_window_builds_without_errors(self) -> None:
@@ -142,6 +156,29 @@ class MainWindowTests(unittest.TestCase):
             self.assertEqual(
                 window.timing_tab.golden_lut.source, "code-density"
             )
+            self.assertEqual(
+                window.modes_tab.lut.source, "code-density"
+            )
+        finally:
+            window.close()
+
+    def test_applying_lut_invalidates_stale_sweep_results(self) -> None:
+        """A new table must not leave config C curves of the old one."""
+        from fpga_tdc_sim.sweep import run_sweep
+
+        window = self.make_window()
+        try:
+            tab = window.sweep_tab
+            tab._on_sweep_done(
+                {
+                    key: run_sweep(config)
+                    for key, config in tab.configs().items()
+                }
+            )
+            self.assertTrue(tab.results)
+            window.line_tab._emit_lut()
+            # results are cleared; a fresh run is started in the worker
+            self.assertFalse(tab.results)
         finally:
             window.close()
 

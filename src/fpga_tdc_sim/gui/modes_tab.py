@@ -1,4 +1,4 @@
-"""Tab 6: pulse-width mode and the multi-hit extension.
+"""Pulse-width mode and the multi-hit extension.
 
 Two different things sit side by side on purpose:
 
@@ -172,8 +172,8 @@ class ModesTab(QWidget):
         self.multi_panel = ParameterPanel("Итог multi-hit")
         for key, caption in [
             ("resolved", "Разрешено эхо"),
-            ("dead", "Мёртвое время канала"),
-            ("gap", "Мин. зазор между эхо"),
+            ("dead", "Стекание линии"),
+            ("gap", "Мёртвое время (импульс + стекание)"),
             ("gap_m", "То же по дальности"),
             ("lost_dead", "Потеряно из-за мёртвого времени"),
             ("lost_fifo", "Отброшено буфером"),
@@ -343,7 +343,7 @@ class ModesTab(QWidget):
             "resolved", f"{result.resolved} из {len(ordered)}"
         )
         self.multi_panel.set_value(
-            "dead", f"{multi.dead_time_ps} пс (стекание линии)"
+            "dead", f"{multi.dead_time_ps} пс"
         )
         self.multi_panel.set_value("gap", f"{gap} пс")
         self.multi_panel.set_value(
@@ -378,7 +378,11 @@ class ModesTab(QWidget):
             self.width_points.setValue(int(state.get("wpoints", 60)))
             self.depth.setValue(int(state.get("depth", 4)))
             self.echoes.setText(
-                str(state.get("echoes", "20000, 45000, 70000"))
+                str(
+                    state.get(
+                        "echoes", "20000, 45000, 70000, 95000, 120000"
+                    )
+                )
             )
             self.pulse.setValue(int(state.get("pulse", 7000)))
         finally:

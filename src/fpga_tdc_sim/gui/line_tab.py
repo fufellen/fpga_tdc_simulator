@@ -1,4 +1,4 @@
-"""Tab 2: delay line, code density, DNL/INL and the calibration LUT.
+"""Delay line, code density, DNL/INL and the calibration LUT.
 
 Reproduces the code-density calibration loop: accumulate a histogram of
 raw fine codes from hits uncorrelated with the clock, convert counts to
@@ -348,9 +348,14 @@ class LineTab(QWidget):
             "inl_ps",
             f"{analysis.max_abs_inl * analysis.lsb_avg:.1f} пс",
         )
-        golden = (fixtures_dir() / "calibration.hex").read_text(
-            encoding="ascii"
-        )
+        try:
+            golden = (fixtures_dir() / "calibration.hex").read_text(
+                encoding="ascii"
+            )
+        except (OSError, FileNotFoundError):
+            # missing fixtures must not take the whole tab down
+            self.stats.set_value("match", None)
+            return
         same = analysis.to_calibration_hex_text() == golden
         self.stats.set_value(
             "match",

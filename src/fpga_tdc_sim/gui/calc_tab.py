@@ -1,4 +1,4 @@
-"""Tab 4: system-parameter calculator.
+"""System-parameter calculator.
 
 Design formulas from the project notes: LSB = T_clk/N, sigma_q =
 LSB/sqrt(12), t_max = 2**b * T_clk, d = c*t/2, sigma_t with jitter and
@@ -158,7 +158,7 @@ class CalcTab(QWidget):
 
         self.rate_panel = ParameterPanel("Темп измерений")
         for key, caption in [
-            ("dead", "Мёртвое время"),
+            ("dead", "Мёртвое время (импульс + стекание)"),
             ("rate", "Предельный темп на канал"),
             ("gap", "Мин. зазор между эхо"),
             ("spi", "Для сравнения: чтение TDC7201 по SPI"),
