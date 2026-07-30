@@ -32,7 +32,9 @@ def main() -> int:
     window.resize(1500, 950)
     window.show()
 
-    tabs = {"timing": 0, "line": 1, "sweep": 2, "calc": 3}
+    from fpga_tdc_sim.gui.app import TAB_ORDER
+
+    tabs = {name: i for i, name in enumerate(TAB_ORDER)}
     sweep_tab = window.sweep_tab
     sweep_tab._auto_started = True          # keep the grab deterministic
     results = {

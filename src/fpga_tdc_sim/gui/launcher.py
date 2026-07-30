@@ -19,7 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--tab",
-        choices=("timing", "line", "sweep", "calc"),
+        choices=("timing", "line", "sweep", "modes", "frontend", "calc"),
         default="timing",
         help="вкладка, открытая при запуске",
     )

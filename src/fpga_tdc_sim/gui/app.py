@@ -26,7 +26,9 @@ from ..calib import CalibrationLut
 from ..fixtures import fixtures_dir
 from ..params import TdcParams
 from .calc_tab import CalcTab
+from .frontend_tab import FrontendTab
 from .line_tab import LineTab
+from .modes_tab import ModesTab
 from .sweep_tab import SweepTab
 from .timing_tab import TimingTab
 
@@ -34,7 +36,7 @@ SETTINGS_ORGANIZATION = "fpga_tdc_sim"
 SETTINGS_APPLICATION = "FPGA_TDC_Simulator"
 SETTINGS_SCHEMA_VERSION = 1
 
-TAB_ORDER = ("timing", "line", "sweep", "calc")
+TAB_ORDER = ("timing", "line", "sweep", "modes", "frontend", "calc")
 
 RTL_BASELINE = (
     "RTL-эталон: verilog @ fpga_tdc / aadf5b89, "
@@ -74,10 +76,14 @@ class MainWindow(QMainWindow):
         self.timing_tab = TimingTab(self.params, self.golden_lut)
         self.line_tab = LineTab(self.params)
         self.sweep_tab = SweepTab(self.params, self.golden_lut)
+        self.modes_tab = ModesTab(self.params, self.golden_lut)
+        self.frontend_tab = FrontendTab(self.params)
         self.calc_tab = CalcTab()
         self.tabs.addTab(self.timing_tab, "Измерение")
         self.tabs.addTab(self.line_tab, "Линия и калибровка")
         self.tabs.addTab(self.sweep_tab, "Развёртка и статистика")
+        self.tabs.addTab(self.modes_tab, "Ширина и multi-hit")
+        self.tabs.addTab(self.frontend_tab, "Аналоговый вход")
         self.tabs.addTab(self.calc_tab, "Параметры системы")
         self.setCentralWidget(self.tabs)
 
@@ -94,6 +100,7 @@ class MainWindow(QMainWindow):
     def _on_lut_ready(self, lut: CalibrationLut) -> None:
         self.golden_lut = lut
         self.sweep_tab.set_lut(lut)
+        self.modes_tab.set_lut(lut)
         self.timing_tab.golden_lut = lut
         self.timing_tab.recompute()
         self.statusBar().showMessage(
@@ -118,6 +125,8 @@ class MainWindow(QMainWindow):
             "timing": self.timing_tab.persistent_state(),
             "line": self.line_tab.persistent_state(),
             "sweep": self.sweep_tab.persistent_state(),
+            "modes": self.modes_tab.persistent_state(),
+            "frontend": self.frontend_tab.persistent_state(),
             "calc": self.calc_tab.persistent_state(),
         }
         self._settings.setValue(
@@ -144,6 +153,12 @@ class MainWindow(QMainWindow):
             self.line_tab.restore_persistent_state(state.get("line", {}))
             self.sweep_tab.restore_persistent_state(
                 state.get("sweep", {})
+            )
+            self.modes_tab.restore_persistent_state(
+                state.get("modes", {})
+            )
+            self.frontend_tab.restore_persistent_state(
+                state.get("frontend", {})
             )
             self.calc_tab.restore_persistent_state(state.get("calc", {}))
         index = self._settings.value("tab", 0, type=int)

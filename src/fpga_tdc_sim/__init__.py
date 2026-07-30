@@ -21,6 +21,20 @@ from .density import (
     parse_code_density_text,
 )
 from .fixtures import fixtures_dir
+from .frontend import (
+    LTSPICE_REFERENCE,
+    DiscriminatorResult,
+    EchoShape,
+    FrontEndConfig,
+    WalkCompensation,
+    Waveform,
+    cfd_span_ps,
+    discriminate,
+    simulate,
+    walk_curve,
+    walk_span_ps,
+)
+from .multihit import EchoReturn, MultiHitResult, MultiHitTdc
 from .params import DEFAULT_PARAMS, TdcParams
 from .sweep import (
     MODELSIM_GOLDEN,
@@ -52,6 +66,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "DEFAULT_PARAMS",
+    "LTSPICE_REFERENCE",
     "MODELSIM_GOLDEN",
     "SPEED_OF_LIGHT_M_S",
     "CalibrationError",
@@ -61,9 +76,15 @@ __all__ = [
     "CodeDensityData",
     "DelayLine",
     "DensityAnalysis",
+    "DiscriminatorResult",
+    "EchoReturn",
+    "EchoShape",
+    "FrontEndConfig",
     "IntervalEvent",
     "MeasurementDiag",
     "MonteCarloPoint",
+    "MultiHitResult",
+    "MultiHitTdc",
     "Pulse",
     "SweepConfig",
     "SweepPoint",
@@ -73,17 +94,24 @@ __all__ = [
     "TdcChannel",
     "TdcParams",
     "TdcTop",
+    "WalkCompensation",
+    "Waveform",
     "accumulate_histogram",
     "analyze",
+    "cfd_span_ps",
     "compute",
     "counter_bits_for_distance",
+    "discriminate",
     "distance_to_time_ps",
     "fixtures_dir",
     "parse_code_density_file",
     "parse_code_density_text",
     "run_monte_carlo",
     "run_sweep",
+    "simulate",
     "sweep_dt_values",
     "time_to_distance_m",
+    "walk_curve",
+    "walk_span_ps",
     "__version__",
 ]

@@ -39,10 +39,47 @@ class MainWindowTests(unittest.TestCase):
         return MainWindow(settings=settings, persist_settings=persist)
 
     def test_window_builds_without_errors(self) -> None:
+        from fpga_tdc_sim.gui.app import TAB_ORDER
+
         window = self.make_window()
         try:
             self.assertEqual(window.reported_errors, [])
-            self.assertEqual(window.tabs.count(), 4)
+            self.assertEqual(window.tabs.count(), len(TAB_ORDER))
+            self.assertEqual(window.tabs.count(), 6)
+        finally:
+            window.close()
+
+    def test_every_named_tab_can_be_selected(self) -> None:
+        from fpga_tdc_sim.gui.app import TAB_ORDER
+
+        window = self.make_window()
+        try:
+            for index, name in enumerate(TAB_ORDER):
+                window.select_tab(name)
+                self.assertEqual(window.tabs.currentIndex(), index)
+        finally:
+            window.close()
+
+    def test_modes_tab_measures_width_and_multi_hit(self) -> None:
+        window = self.make_window()
+        try:
+            tab = window.modes_tab
+            self.assertEqual(tab.table.rowCount(), 5)
+            # the width sweep must produce a usable range
+            self.assertNotEqual(
+                tab.width_panel._labels["ok"].text(), "не измерено"
+            )
+        finally:
+            window.close()
+
+    def test_frontend_tab_reproduces_ltspice(self) -> None:
+        window = self.make_window()
+        try:
+            tab = window.frontend_tab
+            # defaults match the netlist, so the cross-check is filled in
+            text = tab.ref_panel._labels["a100"].text()
+            self.assertIn("2066", text)
+            self.assertNotEqual(text, "не измерено")
         finally:
             window.close()
 
