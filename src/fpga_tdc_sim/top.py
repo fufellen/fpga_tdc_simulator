@@ -146,6 +146,61 @@ class TdcTop:
             interval=interval,
         )
 
+    # ---- pulse-width mode ---------------------------------------------------
+
+    def measure_width(
+        self,
+        width_ps: int,
+        start_phase_ps: int = 1234,
+        hold_ps: int = 7000,
+        start_edge: int = 8,
+    ) -> MeasurementDiag:
+        """Measure the width of one echo pulse.
+
+        No RTL change is needed — this is a wiring of the same
+        ``tdc_top``: the echo drives the START channel and its inverted
+        copy drives the STOP channel, so the measured "interval" is the
+        echo width.  Used in the lidar for walk compensation, where the
+        width stands in for the echo amplitude.
+
+        The START channel therefore sees a pulse exactly ``width_ps``
+        long.  When that is shorter than the clock period the line
+        cannot hold a clean thermometer until the sampling edge: the
+        pulse becomes a narrow band running down the taps, and the
+        measurement degrades or disappears.  The model reproduces that
+        honestly instead of hiding it — check ``measured_ps is None``.
+        """
+        if width_ps < 1:
+            raise ValueError("width must be positive")
+        t0 = self.start_channel.edge_time(start_edge) + start_phase_ps
+        echo = Pulse(t0, t0 + width_ps)
+        inverted = Pulse(t0 + width_ps, t0 + width_ps + hold_ps)
+        start_cap = self.start_channel.capture(echo)
+        stop_cap = self.stop_channel.capture(inverted)
+        start_res = self.timestamp_ps(start_cap) if start_cap else None
+        stop_res = self.timestamp_ps(stop_cap) if stop_cap else None
+        interval = None
+        if start_res is not None and stop_res is not None:
+            events = self.pair_events([start_res], [stop_res])
+            interval = events[0] if events else None
+        return MeasurementDiag(
+            true_interval_ps=width_ps,
+            start_pulse=echo,
+            stop_pulse=inverted,
+            start=start_res,
+            stop=stop_res,
+            interval=interval,
+        )
+
+    @property
+    def min_clean_width_ps(self) -> int:
+        """Shortest echo the START channel can hold to a clock edge.
+
+        Below one clock period the thermometer snapshot is no longer a
+        prefix of ones (see :meth:`measure_width`).
+        """
+        return self.params.tclk_ps
+
     # ---- pairing FSM (exact port of the tdc_top always block) --------------
 
     def pair_events(
